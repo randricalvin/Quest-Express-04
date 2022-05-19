@@ -12,37 +12,20 @@ const app = express();
 // If an environment variable named PORT exists, we take it in order to let the user change the port without chaning the source code. Otherwise we give a default value of 3000
 const port = process.env.PORT ?? 3000;
 
-connection.connect((err) => {
-  if (err) {
-    console.error('error connecting: ' + err.stack);
-  } else {
-    console.log('connected to database with threadId :  ' + connection.threadId);
-  }
-});
-
 app.use(express.json());
 
-app.get("/api/users", (req, res) => {
-  connection.query("SELECT * FROM users", (err, result) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send("Error retrieving data from database");
-    } else {
-      res.json(result);
-    }
-  });
-});
-
-app.post('/api/users', (req, res) => {
-  const { firstname, lastname, email } = req.body;
-  // const threadId = req.body;
+app.put('/api/movies/:movieId', (req, res) => {
+  const { movieId } = req.params;
+  const moviePropsToUpdate = req.body;
   connection.query(
-    'INSERT INTO users(firstname, lastname, email) VALUES (?, ?, ?)', [firstname, lastname, email],
-    (err, result) => {
+    'UPDATE movies SET ? WHERE id = ?',
+    [moviePropsToUpdate, movieId],
+    (err) => {
       if (err) {
-        res.status(500).send('Error saving the user');
+        console.log(err);
+        res.status(500).send('Error updating a user');
       } else {
-        res.status(200).send('user successfully saved');
+        res.status(200).send('User updated successfully 🎉');
       }
     }
   );
